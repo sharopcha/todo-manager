@@ -2,15 +2,114 @@
   <div>
     <h3>Todos</h3>
 
-    <div class="todos"></div>
+    <div class="legend">
+      <span>Double click to mark as complete</span>
+      <span>
+        <span class="incomplete-box"></span> = Incomplete
+      </span>
+      <span>
+        <span class="complete-box"></span> = Complete
+      </span>
+    </div>
+
+    <div class="todos">
+      <div
+        v-for="todo in allTodos"
+        :key="todo.id"
+        @dblclick="onDblClick(todo)"
+        :class="{'is-complete':todo.completed}"
+        class="todo"
+      >
+        {{ todo.title }}
+        <i @click="deleteTodo(todo.id)" class="fas fa-trash-alt"></i>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
+import { mapGetters, mapActions } from "vuex";
+
 export default {
-  name: "todos"
+  name: "Todos",
+  methods: {
+    ...mapActions(["fetchTodos", "deleteTodo", "updateTodo"]),
+    onDblClick(todo) {
+      const updated = {
+        id: todo.id,
+        title: todo.title,
+        completed: !todo.completed
+      };
+
+      this.updateTodo(updated);
+    }
+  },
+  created() {
+    this.fetchTodos();
+  },
+  computed: mapGetters(["allTodos"])
 };
 </script>
 
-<style>
+<style scoped>
+.todos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 1rem;
+}
+
+.todo {
+  border: 1px solid #ccc;
+  background: #41b883;
+  border-radius: 5px;
+  text-align: center;
+  position: relative;
+  cursor: pointer;
+  padding: 20px;
+}
+
+.is-complete {
+  background: #35495e;
+  color: #fff;
+}
+
+i {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  color: #fff;
+  cursor: pointer;
+}
+
+i:hover {
+  color: rgb(206, 17, 17);
+  transform: scale(1.2);
+  transition: all 0.3s;
+}
+
+.legend {
+  display: grid;
+  justify-content: space-around;
+  margin-bottom: 1rem;
+}
+
+.complete-box {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background: #35495e;
+}
+
+.incomplete-box {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background: #41b883;
+}
+
+@media (max-width: 500px) {
+  .todos {
+    grid-template-columns: 1fr;
+  }
+}
 </style>
